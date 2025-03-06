@@ -36,7 +36,15 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async findByUsername(username: string) {
-    return await this.usersRepository.findOne({ where: { username } });
+  async findMany(query: string): Promise<User[] | null> {
+    return await this.usersRepository.find({
+      where: [{ email: query }, { username: query }],
+    });
+  }
+
+  async findByUsername(username: string): Promise<User | null> {
+    return await this.usersRepository.findOne({
+      where: { username },
+    });
   }
 }
