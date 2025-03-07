@@ -9,9 +9,13 @@ import { OffersModule } from './offers/offers.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { HashModule } from './hash/hash.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['.env.testing', '.env.development', '.env'],
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -28,6 +32,7 @@ import { HashModule } from './hash/hash.module';
     OffersModule,
     AuthModule,
     HashModule,
+    ConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],
