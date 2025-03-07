@@ -4,6 +4,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -13,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../shared/types/interfaces';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,6 +24,15 @@ export class UsersController {
   @Get('me')
   async getCurrentUser(@Req() req: RequestWithUser) {
     return await this.usersService.findById(req.user.id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('me')
+  async editCurrentUser(
+    @Req() req: RequestWithUser,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return await this.usersService.updateOne(req.user.id, updateUserDto);
   }
 
   @Post()

@@ -8,6 +8,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashService } from '../hash/hash.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -60,5 +61,23 @@ export class UsersService {
     return await this.usersRepository.findOne({
       where: { username },
     });
+  }
+
+  async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await this.hashService.hash(
+        updateUserDto.password,
+      );
+    }
+
+    await this.usersRepository.update(id, updateUserDto);
+
+    return await this.findById(id);
   }
 }
