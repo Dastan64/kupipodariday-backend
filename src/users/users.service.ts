@@ -9,6 +9,7 @@ import { FindOneOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashService } from '../hash/hash.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Wish } from '../wishes/entities/wish.entity';
 
 @Injectable()
 export class UsersService {
@@ -67,8 +68,8 @@ export class UsersService {
     return user;
   }
 
-  async findByUsername(username: string): Promise<User | null> {
-    return await this.usersRepository.findOne({
+  async findByUsername(username: string): Promise<User> {
+    return await this.findOne({
       where: { username },
     });
   }
@@ -87,12 +88,12 @@ export class UsersService {
     return await this.findOne({ where: { id } });
   }
 
-  async findWishes(id: number) {
+  async findWishes(query: { id?: number; username?: string }): Promise<Wish[]> {
     const user = await this.findOne({
-      where: { id },
+      where: query,
       relations: { wishes: true },
     });
 
-    return user.wishes;
+    return user.wishes || [];
   }
 }

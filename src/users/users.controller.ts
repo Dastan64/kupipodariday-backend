@@ -15,6 +15,7 @@ import { User } from './entities/user.entity';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../shared/types/interfaces';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Wish } from '../wishes/entities/wish.entity';
 
 @Controller('users')
 export class UsersController {
@@ -38,7 +39,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Get('me/wishes')
   async getProfileWishes(@Req() req: RequestWithUser) {
-    return await this.usersService.findWishes(req.user.id);
+    return await this.usersService.findWishes({ id: req.user.id });
   }
 
   @Post()
@@ -48,13 +49,14 @@ export class UsersController {
 
   @Get(':username')
   async getByUsername(@Param('username') username: string): Promise<User> {
-    const user = await this.usersService.findByUsername(username);
+    return await this.usersService.findByUsername(username);
+  }
 
-    if (!user) {
-      throw new NotFoundException('Пользователь с таким ником не найден');
-    }
-
-    return user;
+  @Get(':username/wishes')
+  async getWishesByUsername(
+    @Param('username') username: string,
+  ): Promise<Wish[]> {
+    return await this.usersService.findWishes({ username });
   }
 
   @Post('find')
