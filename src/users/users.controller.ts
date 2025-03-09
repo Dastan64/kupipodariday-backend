@@ -35,6 +35,12 @@ export class UsersController {
     return await this.usersService.updateOne(req.user.id, updateUserDto);
   }
 
+  @UseGuards(JwtGuard)
+  @Get('me/wishes')
+  async getProfileWishes(@Req() req: RequestWithUser) {
+    return await this.usersService.findWishes(req.user.id);
+  }
+
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto);

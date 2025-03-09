@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashService } from '../hash/hash.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -57,6 +57,16 @@ export class UsersService {
     return user;
   }
 
+  async findOne(options: FindOneOptions<User>): Promise<User> {
+    const user = await this.usersRepository.findOne(options);
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    return user;
+  }
+
   async findByUsername(username: string): Promise<User | null> {
     return await this.usersRepository.findOne({
       where: { username },
@@ -64,11 +74,7 @@ export class UsersService {
   }
 
   async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findById(id);
-
-    if (!user) {
-      throw new NotFoundException();
-    }
+    await this.findOne({ where: { id } });
 
     if (updateUserDto.password) {
       updateUserDto.password = await this.hashService.hash(
@@ -78,6 +84,15 @@ export class UsersService {
 
     await this.usersRepository.update(id, updateUserDto);
 
-    return await this.findById(id);
+    return await this.findOne({ where: { id } });
+  }
+
+  async findWishes(id: number) {
+    const user = await this.findOne({
+      where: { id },
+      relations: { wishes: true },
+    });
+
+    return user.wishes;
   }
 }
