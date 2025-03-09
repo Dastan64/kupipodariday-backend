@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../shared/types/interfaces';
@@ -40,11 +39,6 @@ export class UsersController {
   @Get('me/wishes')
   async getProfileWishes(@Req() req: RequestWithUser) {
     return await this.usersService.findWishes({ id: req.user.id });
-  }
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
   }
 
   @Get(':username')

@@ -48,14 +48,8 @@ export class UsersService {
     });
   }
 
-  async findById(id: number) {
-    const user = await this.usersRepository.findOneBy({ id });
-
-    if (!user) {
-      throw new NotFoundException('Пользователь с таким id не найден');
-    }
-
-    return user;
+  async findById(id: number): Promise<User> {
+    return await this.findOne({ where: { id } });
   }
 
   async findOne(options: FindOneOptions<User>): Promise<User> {
