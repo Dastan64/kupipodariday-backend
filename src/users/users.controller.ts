@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -15,6 +14,7 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../shared/types/interfaces';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Wish } from '../wishes/entities/wish.entity';
+import { FindUsersDto } from './dto/find-users.dto';
 
 @Controller('users')
 export class UsersController {
@@ -54,13 +54,7 @@ export class UsersController {
   }
 
   @Post('find')
-  async findAll(query: string): Promise<User[]> {
-    const users = await this.usersService.findMany(query);
-
-    if (!users || !users.length) {
-      throw new NotFoundException('Пользователь с таким ником не найден');
-    }
-
-    return users;
+  async findAll(@Body() { query }: FindUsersDto): Promise<User[]> {
+    return await this.usersService.findMany(query);
   }
 }
