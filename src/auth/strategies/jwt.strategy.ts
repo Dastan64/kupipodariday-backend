@@ -13,9 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey:
-        // @ts-expect-error вызов this необходим
-        this.configService.get<string>('jwt_secret') ?? 'default_secret',
+      secretOrKey: configService.get<string>('jwt_secret') ?? 'default_secret',
     });
   }
 
