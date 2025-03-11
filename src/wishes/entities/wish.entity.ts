@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { IsUrl, Length } from 'class-validator';
+import { IsNumber, IsUrl, Length } from 'class-validator';
 
 import { User } from '../../users/entities/user.entity';
 import { Offer } from '../../offers/entities/offer.entity';
@@ -20,9 +20,11 @@ export class Wish extends BaseEntity {
   image: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @IsNumber()
   price: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @IsNumber()
   raised: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
@@ -34,6 +36,6 @@ export class Wish extends BaseEntity {
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'int', default: 0 })
   copied: number;
 }

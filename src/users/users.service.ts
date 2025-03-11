@@ -85,7 +85,7 @@ export class UsersService {
   async findWishes(query: { id?: number; username?: string }): Promise<Wish[]> {
     const user = await this.findOne({
       where: query,
-      relations: { wishes: true },
+      relations: ['wishes', 'wishes.owner', 'wishes.offers'],
     });
 
     return user.wishes || [];
