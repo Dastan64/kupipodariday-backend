@@ -1,42 +1,38 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
-import { UpdateOfferDto } from './dto/update-offer.dto';
+import { Offer } from './entities/offer.entity';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { RequestWithUser } from '../shared/types/interfaces';
 
+@UseGuards(JwtGuard)
 @Controller('offers')
 export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
-  @Post()
-  create(@Body() createOfferDto: CreateOfferDto) {
-    return this.offersService.create(createOfferDto);
+  @Post('/')
+  async create(
+    @Req() req: RequestWithUser,
+    @Body() createOfferDto: CreateOfferDto,
+  ) {
+    return await this.offersService.create(createOfferDto, req.user.id);
   }
 
-  @Get()
-  findAll() {
+  @Get('/')
+  async getAllOffers(): Promise<Offer[]> {
     return this.offersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.offersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
-    return this.offersService.update(+id, updateOfferDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.offersService.remove(+id);
+  async getOfferById(@Param('id') id: number) {
+    return this.offersService.findOfferById(id);
   }
 }
