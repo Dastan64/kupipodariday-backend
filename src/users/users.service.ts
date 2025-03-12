@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashService } from '../hash/hash.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Wish } from '../wishes/entities/wish.entity';
+import { DatabaseError } from 'pg';
 
 @Injectable()
 export class UsersService {
@@ -20,26 +21,28 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { email, username, password } = createUserDto;
+    const { password } = createUserDto;
 
-    const existingUser = await this.usersRepository.findOne({
-      where: [{ email }, { username }],
-    });
+    try {
+      const hashedPassword = await this.hashService.hash(password);
 
-    if (existingUser) {
-      throw new ConflictException(
-        'Пользователь с таким email или ником уже существует',
-      );
+      const user = this.usersRepository.create({
+        ...createUserDto,
+        password: hashedPassword,
+      });
+
+      return await this.usersRepository.save(user);
+    } catch (error: unknown) {
+      if (error instanceof QueryFailedError) {
+        const pgError = error.driverError as DatabaseError;
+        if (pgError.code === '23505') {
+          throw new ConflictException(
+            'Пользователь с таким email или ником уже существует',
+          );
+        }
+      }
+      throw error;
     }
-
-    const hashedPassword = await this.hashService.hash(password);
-
-    const user = this.usersRepository.create({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-
-    return this.usersRepository.save(user);
   }
 
   async findMany(query: string): Promise<User[]> {
