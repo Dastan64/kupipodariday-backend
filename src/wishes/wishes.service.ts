@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { Wish } from './entities/wish.entity';
 import { User } from '../users/entities/user.entity';
 import { UpdateWishDto } from './dto/update-wish.dto';
@@ -29,7 +29,7 @@ export class WishesService {
     return this.findOne({ where: { id: savedWish.id }, relations: ['owner'] });
   }
 
-  async findOne(options: FindOneOptions<Wish>) {
+  async findOne(options: FindOneOptions<Wish>): Promise<Wish> {
     const wish = await this.wishesRepository.findOne(options);
 
     if (!wish) {
@@ -37,6 +37,10 @@ export class WishesService {
     }
 
     return wish;
+  }
+
+  async findAll(options: FindOptionsWhere<Wish>): Promise<Wish[]> {
+    return await this.wishesRepository.findBy(options);
   }
 
   async getLastWishes(): Promise<Wish[]> {
