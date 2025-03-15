@@ -4,6 +4,7 @@ import { IsEmail, IsUrl, Length } from 'class-validator';
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
+
 import { BaseEntity } from '../../shared/base.entity';
 import { defaultUserSetting } from '../constants/user';
 

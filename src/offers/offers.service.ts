@@ -3,10 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateOfferDto } from './dto/create-offer.dto';
-import { Offer } from './entities/offer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
+
+import { CreateOfferDto } from './dto/create-offer.dto';
+
+import { Offer } from './entities/offer.entity';
+
 import { WishesService } from '../wishes/wishes.service';
 import { UsersService } from '../users/users.service';
 
@@ -62,11 +65,9 @@ export class OffersService {
   }
 
   async findAll(): Promise<Offer[]> {
-    const offers = await this.offersRepository.find({
+    return await this.offersRepository.find({
       relations: ['user', 'item'],
     });
-
-    return offers;
   }
 
   async findOfferById(id: number): Promise<Offer> {

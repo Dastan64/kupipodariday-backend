@@ -8,16 +8,20 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { WishlistsService } from './wishlists.service';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { RequestWithUser } from '../shared/types/interfaces';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { Wishlist } from './entities/wishlist.entity';
+import { SensitiveDataInterceptor } from '../shared/interceptors/sensitive-data-interceptor';
+
+import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
 @UseGuards(JwtGuard)
 @Controller('wishlistlists')
+@UseInterceptors(SensitiveDataInterceptor)
 export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
 
@@ -41,10 +45,15 @@ export class WishlistsController {
 
   @Patch(':id')
   async updateWishlistById(
+    @Req() req: RequestWithUser,
     @Param('id') id: number,
     @Body() updateWishlistDto: UpdateWishlistDto,
   ): Promise<Wishlist> {
-    return await this.wishlistsService.updateOne(id, updateWishlistDto);
+    return await this.wishlistsService.updateOne(
+      id,
+      updateWishlistDto,
+      req.user,
+    );
   }
 
   @Delete(':id')

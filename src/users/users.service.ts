@@ -3,14 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { DatabaseError } from 'pg';
+
 import { FindOneOptions, QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashService } from '../hash/hash.service';
+
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+import { User } from './entities/user.entity';
 import { Wish } from '../wishes/entities/wish.entity';
-import { DatabaseError } from 'pg';
 
 @Injectable()
 export class UsersService {

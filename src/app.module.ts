@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
@@ -9,7 +7,7 @@ import { OffersModule } from './offers/offers.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { HashModule } from './hash/hash.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
 import { User } from './users/entities/user.entity';
@@ -21,17 +19,22 @@ import { Wishlist } from './wishlists/entities/wishlist.entity';
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.env.testing', '.env.development', '.env'],
+      isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'student',
-      password: 'student',
-      schema: 'nest_project',
-      database: 'nest_project',
-      entities: [User, Wish, Offer, Wishlist],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: 'localhost',
+        port: configService.get('DATABASE_PORT'),
+        username: 'student',
+        password: 'student',
+        schema: 'nest_project',
+        database: configService.get('DATABASE_NAME'),
+        entities: [User, Wish, Offer, Wishlist],
+        synchronize: true,
+      }),
     }),
     UsersModule,
     WishesModule,
@@ -40,9 +43,7 @@ import { Wishlist } from './wishlists/entities/wishlist.entity';
     AuthModule,
     JwtModule,
     HashModule,
-    ConfigModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AuthService],
+  providers: [AuthService],
 })
 export class AppModule {}

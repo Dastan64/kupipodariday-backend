@@ -6,15 +6,18 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { Offer } from './entities/offer.entity';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../shared/types/interfaces';
+import { SensitiveDataInterceptor } from '../shared/interceptors/sensitive-data-interceptor';
 
 @UseGuards(JwtGuard)
 @Controller('offers')
+@UseInterceptors(SensitiveDataInterceptor)
 export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 

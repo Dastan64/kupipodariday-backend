@@ -4,12 +4,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateWishDto } from './dto/create-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+
 import { Wish } from './entities/wish.entity';
 import { User } from '../users/entities/user.entity';
+
 import { UpdateWishDto } from './dto/update-wish.dto';
+import { CreateWishDto } from './dto/create-wish.dto';
 
 @Injectable()
 export class WishesService {
@@ -66,7 +68,10 @@ export class WishesService {
   }
 
   async findWishById(id: number): Promise<Wish> {
-    return await this.findOne({ where: { id }, relations: ['owner'] });
+    return await this.findOne({
+      where: { id },
+      relations: ['owner', 'offers'],
+    });
   }
 
   async updateWishWithChecks(
@@ -78,6 +83,12 @@ export class WishesService {
 
     if (wish.owner.id !== user.id) {
       throw new ForbiddenException('Вы не можете редактировать чужой подарок');
+    }
+
+    if (updateWishDto.raised) {
+      throw new ForbiddenException(
+        'Сумма собранных средств недоступна для изменения',
+      );
     }
 
     if (wish.offers.length > 0 && updateWishDto.price) {

@@ -3,13 +3,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Wishlist } from './entities/wishlist.entity';
 import { FindOneOptions, In, Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
-import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 import { WishesService } from '../wishes/wishes.service';
+
+import { Wishlist } from './entities/wishlist.entity';
+import { User } from '../users/entities/user.entity';
+
+import { CreateWishlistDto } from './dto/create-wishlist.dto';
+import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
 @Injectable()
 export class WishlistsService {
@@ -65,12 +67,17 @@ export class WishlistsService {
   async updateOne(
     id: number,
     updateWishlistDto: UpdateWishlistDto,
+    user: User,
   ): Promise<Wishlist> {
-    await this.findOne({ where: { id } });
+    const wishlist = await this.findOne({ where: { id } });
+
+    if (wishlist.owner.id !== user.id) {
+      throw new ForbiddenException('Вы не можете редактировать чужой вишлист');
+    }
 
     await this.wishlistsRepository.update(id, updateWishlistDto);
 
-    return await this.findOne({ where: { id } });
+    return wishlist;
   }
 
   async removeOne(id: number, user: User): Promise<Wishlist> {
