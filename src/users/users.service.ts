@@ -75,7 +75,7 @@ export class UsersService {
   }
 
   async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    await this.findOne({ where: { id } });
+    await this.findById(id);
 
     if (updateUserDto.password) {
       updateUserDto.password = await this.hashService.hash(
@@ -85,7 +85,7 @@ export class UsersService {
 
     await this.usersRepository.update(id, updateUserDto);
 
-    return await this.findOne({ where: { id } });
+    return await this.findById(id);
   }
 
   async findWishes(query: { id?: number; username?: string }): Promise<Wish[]> {

@@ -43,7 +43,7 @@ export class WishlistsService {
     });
   }
 
-  async findWishlistById(id: number): Promise<Wishlist> {
+  async findById(id: number): Promise<Wishlist> {
     return await this.findOne({ where: { id }, relations: ['owner', 'items'] });
   }
 

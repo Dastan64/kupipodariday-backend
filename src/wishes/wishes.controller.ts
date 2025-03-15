@@ -51,7 +51,7 @@ export class WishesController {
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async updateWithById(
+  async updateWishById(
     @Req() req: RequestWithUser,
     @Param('id') id: number,
     @Body() updateWishDto: UpdateWishDto,

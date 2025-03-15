@@ -40,7 +40,7 @@ export class WishlistsController {
 
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Wishlist> {
-    return await this.wishlistsService.findWishlistById(id);
+    return await this.wishlistsService.findById(id);
   }
 
   @Patch(':id')
