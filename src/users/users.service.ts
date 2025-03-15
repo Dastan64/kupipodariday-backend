@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { DatabaseError } from 'pg';
 
-import { FindOneOptions, QueryFailedError, Repository } from 'typeorm';
+import { FindOneOptions, ILike, QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashService } from '../hash/hash.service';
 
@@ -50,7 +50,7 @@ export class UsersService {
 
   async findMany(query: string): Promise<User[]> {
     return await this.usersRepository.find({
-      where: [{ email: query }, { username: query }],
+      where: [{ email: query }, { username: ILike(`%${query}%`) }],
     });
   }
 
@@ -70,7 +70,7 @@ export class UsersService {
 
   async findByUsername(username: string): Promise<User> {
     return await this.findOne({
-      where: { username },
+      where: { username: ILike(`%${username}%`) },
     });
   }
 

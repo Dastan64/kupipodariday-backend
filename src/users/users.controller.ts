@@ -25,6 +25,7 @@ import { SensitiveDataInterceptor } from '../shared/interceptors/sensitive-data-
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseInterceptors(SensitiveDataInterceptor)
   @Get('me')
   async getCurrentUser(@Req() req: RequestWithUser) {
     return await this.usersService.findById(req.user.id);
